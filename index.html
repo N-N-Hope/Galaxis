@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Explorer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <!-- Footer -->
+    <footer>
+        <div class="creator-signature">
+            <i class="fas fa-user-astronaut"></i>
+            <span>@By Hope</span>
+        </div>
+    </footer>
+    
+    <!-- Welcome Overlay -->
+    <div class="welcome-overlay" id="welcomeOverlay">
+        <div class="welcome-content">
+            <h1 class="welcome-title">Cosmic Explorer</h1>
+            <p class="welcome-subtitle">Embark on an immersive journey through our solar system. Explore planets, complete missions, and discover the wonders of space!</p>
+            
+            <button class="start-button" id="startButton">
+                <i class="fas fa-rocket"></i> Begin Space Journey
+            </button>
+            
+            <div class="instructions">
+                <h3><i class="fas fa-info-circle"></i> How to Explore</h3>
+                <ul>
+                    <li><i class="fas fa-globe"></i> Click planets in the mission control panel to travel</li>
+                    <li><i class="fas fa-tasks"></i> Complete missions to explore all planets</li>
+                    <li><i class="fas fa-question-circle"></i> Answer quizzes to earn points</li>
+                    <li><i class="fas fa-sliders-h"></i> Adjust settings in the control panel</li>
+                    <li><i class="fas fa-volume-up"></i> Enable audio for immersive experience</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Background elements -->
+    <div class="stars" id="stars"></div>
+    
+    <!-- Travel Effects -->
+    <div class="travel-effects" id="travelEffects">
+        <div class="speed-lines" id="speedLines"></div>
+        <div class="warp-tunnel" id="warpTunnel"></div>
+    </div>
+    
+    <!-- Overlay for modal -->
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- Planet Modal -->
+    <div class="modal" id="planetModal">
+        <div class="modal-header">
+            <h2 class="modal-title">
+                <div class="planet-icon" id="modalIcon"></div>
+                <span id="modalTitle">Planet Name</span>
+            </h2>
+            <button class="close-modal" id="closeModal">&times;</button>
+        </div>
+        <div class="modal-content">
+            <div class="planet-image" id="planetImage">
+                <i class="fas fa-globe-americas"></i>
+            </div>
+            <div class="planet-info">
+                <div class="info-item">
+                    <h3><i class="fas fa-info-circle"></i> Overview</h3>
+                    <p id="planetOverview">Loading planet information...</p>
+                </div>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <h3><i class="fas fa-ruler"></i> Diameter</h3>
+                        <p id="planetDiameter">12,742 km</p>
+                    </div>
+                    <div class="info-item">
+                        <h3><i class="fas fa-sun"></i> Distance from Sun</h3>
+                        <p id="planetDistance">149.6 million km</p>
+                    </div>
+                    <div class="info-item">
+                        <h3><i class="fas fa-moon"></i> Moons</h3>
+                        <p id="planetMoons">1</p>
+                    </div>
+                    <div class="info-item">
+                        <h3><i class="fas fa-temperature-high"></i> Temperature</h3>
+                        <p id="planetTemp">15°C</p>
+                    </div>
+                    <div class="info-item">
+                        <h3><i class="fas fa-weight"></i> Gravity</h3>
+                        <p id="planetGravity">9.8 m/s²</p>
+                    </div>
+                    <div class="info-item">
+                        <h3><i class="fas fa-wind"></i> Atmosphere</h3>
+                        <p id="planetAtmosphere">Nitrogen, Oxygen</p>
+                    </div>
+                    <div class="info-item">
+                        <h3><i class="fas fa-tachometer-alt"></i> Orbit Speed</h3>
+                        <p id="planetOrbitSpeed">29.8 km/s</p>
+                    </div>
+                    <div class="info-item">
+                        <h3><i class="fas fa-history"></i> Orbit Period</h3>
+                        <p id="planetOrbitPeriod">365.25 days</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <h3><i class="fas fa-lightbulb"></i> Did You Know?</h3>
+                    <p id="planetFact">Earth is the only planet known to support life.</p>
+                </div>
+                <div class="quiz-section">
+                    <h3><i class="fas fa-question-circle"></i> Planet Quiz</h3>
+                    <p id="quizQuestion">What is the largest volcano in the solar system?</p>
+                    <div class="quiz-options" id="quizOptions"></div>
+                    <div class="quiz-feedback" id="quizFeedback"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mission Progress -->
+    <div class="mission-progress" id="missionProgress">
+        <div class="hud-label">
+            <i class="fas fa-space-shuttle"></i>
+            Traveling to: <span id="missionTarget">Mars</span>
+            <span id="travelSpeed">at 0 km/s</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+    
+    <!-- Header -->
+    <header>
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-rocket"></i>
+            </div>
+            <h1>Cosmic Explorer</h1>
+        </div>
+        <div class="controls">
+            <button class="btn" id="musicToggle">
+                <i class="fas fa-music"></i> Music: ON
+            </button>
+            <button class="btn" id="narrationToggle">
+                <i class="fas fa-microphone"></i> Narration: ON
+            </button>
+            <button class="btn" id="resetBtn">
+                <i class="fas fa-sync-alt"></i> Reset View
+            </button>
+        </div>
+    </header>
+    
+    <!-- Control Panel -->
+    <div class="control-panel">
+        <div class="panel-title">
+            <i class="fas fa-sliders-h"></i> Mission Controls
+        </div>
+        <div class="slider-container">
+            <div class="slider-label">
+                <span>Orbit Speed</span>
+                <span id="speedValue">5x</span>
+            </div>
+            <input type="range" id="speedSlider" class="slider" min="0.1" max="10" step="0.1" value="5">
+        </div>
+        <div class="slider-container">
+            <div class="slider-label">
+                <span>Planet Scale</span>
+                <span id="scaleValue">1x</span>
+            </div>
+            <input type="range" id="scaleSlider" class="slider" min="0.5" max="3" step="0.1" value="1">
+        </div>
+        
+        <!-- Asteroid Belt Toggle -->
+        <div class="belt-toggle">
+            <span class="toggle-label"><i class="fas fa-asterisk"></i> Asteroid Belt</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="beltToggle" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        
+        <!-- Moons Toggle -->
+        <div class="moon-controls">
+            <span class="toggle-label"><i class="fas fa-moon"></i> Moons</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="moonToggle" checked>
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+        
+        <button class="mission-btn" id="missionBtn">
+            <i class="fas fa-space-shuttle"></i> Start Exploration Mission
+        </button>
+        <div class="slider-container">
+            <div class="slider-label">
+                <span>Mission Progress</span>
+                <span id="progressValue">0%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="missionProgressFill" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <!-- Mission Stats -->
+        <div class="mission-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="visitedPlanets">0</div>
+                <div class="stat-label">Planets Visited</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="quizScore">0</div>
+                <div class="stat-label">Quiz Score</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="timeElapsed">00:00</div>
+                <div class="stat-label">Time Elapsed</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Canvas for Three.js -->
+    <canvas id="spaceCanvas"></canvas>
+    
+    <!-- Mission Control -->
+    <div class="mission-control">
+        <div class="mission-planet mercury" data-planet="mercury" style="background: linear-gradient(145deg, #a9a9a9, #7a7a7a); color: #333;" data-name="Mercury">
+            <i class="fas fa-fire"></i>
+        </div>
+        <div class="mission-planet venus" data-planet="venus" style="background: linear-gradient(145deg, #e39e1c, #b87333);" data-name="Venus">
+            <i class="fas fa-temperature-high"></i>
+        </div>
+        <div class="mission-planet earth" data-planet="earth" style="background: linear-gradient(145deg, #2980b9, #27ae60);" data-name="Earth">
+            <i class="fas fa-globe-americas"></i>
+        </div>
+        <div class="mission-planet mars" data-planet="mars" style="background: linear-gradient(145deg, #e74c3c, #c0392b);" data-name="Mars">
+            <i class="fas fa-mountain"></i>
+        </div>
+        <div class="mission-planet jupiter" data-planet="jupiter" style="background: linear-gradient(145deg, #f39c12, #d35400);" data-name="Jupiter">
+            <i class="fas fa-wind"></i>
+        </div>
+        <div class="mission-planet saturn" data-planet="saturn" style="background: linear-gradient(145deg, #f1c40f, #f39c12);" data-name="Saturn">
+            <i class="fas fa-ring"></i>
+        </div>
+        <div class="mission-planet uranus" data-planet="uranus" style="background: linear-gradient(145deg, #3498db, #2980b9);" data-name="Uranus">
+            <i class="fas fa-sync"></i>
+        </div>
+        <div class="mission-planet neptune" data-planet="neptune" style="background: linear-gradient(145deg, #2980b9, #1a5276);" data-name="Neptune">
+            <i class="fas fa-water"></i>
+        </div>
+        <div class="mission-planet asteroidbelt" data-planet="asteroidbelt" style="background: linear-gradient(145deg, #8a6d3b, #5d4a2a);" data-name="Asteroid Belt">
+            <i class="fas fa-asterisk"></i>
+        </div>
+    </div>
+    
+    <!-- HUD -->
+    <div class="hud">
+        <div class="hud-item">
+            <div class="hud-label">
+                <i class="fas fa-globe"></i> Current Planet
+            </div>
+            <div class="hud-value" id="currentPlanet">Solar System</div>
+        </div>
+        <div class="hud-item">
+            <div class="hud-label">
+                <i class="fas fa-space-shuttle"></i> Mission Status
+            </div>
+            <div class="hud-value" id="missionStatus">Standby</div>
+        </div>
+        <div class="hud-item">
+            <div class="hud-label">
+                <i class="fas fa-clock"></i> System Time
+            </div>
+            <div class="hud-value" id="systemTime">00:00:00</div>
+        </div>
+        <div class="hud-item">
+            <div class="hud-label">
+                <i class="fas fa-tachometer-alt"></i> Orbit Speed
+            </div>
+            <div class="hud-value" id="hudOrbitSpeed">-</div>
+        </div>
+        <div class="hud-item">
+            <div class="hud-label">
+                <i class="fas fa-temperature-low"></i> Temperature
+            </div>
+            <div class="hud-value" id="hudTemperature">-</div>
+        </div>
+        <div class="hud-item">
+            <div class="hud-label">
+                <i class="fas fa-weight"></i> Gravity
+            </div>
+            <div class="hud-value" id="hudGravity">-</div>
+        </div>
+    </div>
+    
+    <!-- Educational Fact Bubble -->
+    <div class="fact-bubble" id="factBubble">
+        <h3><i class="fas fa-lightbulb"></i> Space Fact</h3>
+        <p id="factText">Did you know? The solar system is about 4.6 billion years old!</p>
+    </div>
+    
+    <!-- Planet Labels Container -->
+    <div id="planetLabels" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 20;"></div>
+    
+    <!-- Audio elements -->
+    <audio id="spaceMusic" loop>
+        <source src="https://assets.mixkit.co/music/download/mixkit-game-show-suspense-waiting-667.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="clickSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="engineSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-spaceship-engines-1710.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="warpSound">
+        <source src="https://assets.mixkit.co/sfx/preview/mixkit-sci-fi-whoosh-1710.mp3" type="audio/mpeg">
+    </audio>
+    
+    <script src="server.js"></script>
+</body>
+</html>
